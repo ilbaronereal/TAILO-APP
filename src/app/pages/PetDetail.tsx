@@ -1,10 +1,11 @@
-import { ChevronLeft, Edit, Weight, Ruler, Activity, Plus, Check, Trash2, X, Bell, BellOff } from "lucide-react";
+import { ChevronLeft, Edit, Weight, Ruler, Activity, Plus, Check, Trash2, X, Bell } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { useState } from "react";
 import maxImage from "../../imports/cane-1.jpg";
 import { useChecklist } from "../hooks/useChecklist";
-import { useReminders, TYPE_LABELS as REMINDER_LABELS, TYPE_ICONS as REMINDER_ICONS, ReminderType, daysUntil } from "../hooks/useReminders";
+import { useReminders, daysUntil } from "../hooks/useReminders";
 import { useHealthLog, TYPE_ICONS as HEALTH_ICONS, TYPE_LABELS as HEALTH_LABELS, HealthEventType } from "../hooks/useHealthLog";
+import { ReminderType } from "../hooks/useReminders";
 
 const pets = [
   {
@@ -77,14 +78,12 @@ function ChecklistTab({ petId }: { petId: string }) {
               <span className={`flex-1 text-sm ${item.done ? "line-through text-muted-foreground" : ""}`}>
                 {item.label}
               </span>
-              {!item.isDefault && (
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg bg-red-100 flex items-center justify-center transition-opacity"
-                >
-                  <Trash2 size={12} className="text-red-500" />
-                </button>
-              )}
+              <button
+                onClick={() => removeItem(item.id)}
+                className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity"
+              >
+                <Trash2 size={11} className="text-red-400" />
+              </button>
             </div>
           ))}
         </div>
@@ -143,12 +142,13 @@ function ChecklistTab({ petId }: { petId: string }) {
 function RemindersSection({ petId, petName }: { petId: string; petName: string }) {
   const { upcoming, addReminder, toggleDone, deleteReminder } = useReminders(petId);
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ type: "vaccine" as ReminderType, title: "", dueDate: "", recurrenceDays: "365", notes: "" });
+  const [form, setForm] = useState({ title: "", dueDate: "", recurrenceDays: "", notes: "" });
 
   const urgencyColor = (days: number) => {
-    if (days <= 7) return "bg-red-100 border-red-200 text-red-700";
-    if (days <= 30) return "bg-orange-100 border-orange-200 text-orange-700";
-    return "bg-blue-50 border-blue-100 text-blue-700";
+    if (days <= 0) return "bg-red-100 border-red-200";
+    if (days <= 7) return "bg-red-50 border-red-100";
+    if (days <= 30) return "bg-orange-50 border-orange-100";
+    return "bg-muted/30 border-border";
   };
 
   return (
@@ -165,52 +165,63 @@ function RemindersSection({ petId, petName }: { petId: string; petName: string }
 
       {showAdd && (
         <div className="bg-muted/30 rounded-2xl p-4 mb-4 space-y-3">
-          <select
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value as ReminderType })}
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
-          >
-            {(Object.keys(REMINDER_LABELS) as ReminderType[]).map((t) => (
-              <option key={t} value={t}>{REMINDER_ICONS[t]} {REMINDER_LABELS[t]}</option>
-            ))}
-          </select>
-          <input
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Titolo reminder"
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
-          />
-          <input
-            type="date"
-            value={form.dueDate}
-            onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
-          />
-          <select
-            value={form.recurrenceDays}
-            onChange={(e) => setForm({ ...form, recurrenceDays: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
-          >
-            <option value="">Nessuna ricorrenza</option>
-            <option value="30">Ogni mese</option>
-            <option value="90">Ogni 3 mesi</option>
-            <option value="180">Ogni 6 mesi</option>
-            <option value="365">Ogni anno</option>
-          </select>
-          <textarea
-            value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            placeholder="Note (opzionale)"
-            rows={2}
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm resize-none"
-          />
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Titolo *</label>
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="es. Vaccino annuale"
+              className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Data *</label>
+            <input
+              type="date"
+              value={form.dueDate}
+              onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+              className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Frequenza</label>
+            <select
+              value={form.recurrenceDays}
+              onChange={(e) => setForm({ ...form, recurrenceDays: e.target.value })}
+              className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
+            >
+              <option value="">Nessuna ricorrenza</option>
+              <option value="30">Ogni mese</option>
+              <option value="90">Ogni 3 mesi</option>
+              <option value="180">Ogni 6 mesi</option>
+              <option value="365">Ogni anno</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Note</label>
+            <textarea
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              placeholder="Note opzionali..."
+              rows={2}
+              className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm resize-none"
+            />
+          </div>
           <div className="flex gap-2">
             <button
               onClick={() => {
                 if (!form.title || !form.dueDate) return;
-                addReminder({ ...form, petId, petName, recurrenceDays: form.recurrenceDays ? parseInt(form.recurrenceDays) : undefined });
+                addReminder({
+                  type: "custom" as ReminderType,
+                  title: form.title,
+                  dueDate: form.dueDate,
+                  petId,
+                  petName,
+                  recurrenceDays: form.recurrenceDays ? parseInt(form.recurrenceDays) : undefined,
+                  notes: form.notes || undefined,
+                });
                 setShowAdd(false);
-                setForm({ type: "vaccine", title: "", dueDate: "", recurrenceDays: "365", notes: "" });
+                setForm({ title: "", dueDate: "", recurrenceDays: "", notes: "" });
               }}
               className="flex-1 py-2 rounded-xl bg-[var(--pastel-orange)] text-white text-sm"
             >
@@ -230,28 +241,22 @@ function RemindersSection({ petId, petName }: { petId: string; petName: string }
           {upcoming.map((r) => {
             const days = daysUntil(r.dueDate);
             return (
-              <div key={r.id} className={`flex items-center gap-3 p-3 rounded-2xl border ${urgencyColor(days)} group`}>
-                <span className="text-xl flex-shrink-0">{REMINDER_ICONS[r.type]}</span>
+              <div key={r.id} className={`flex items-center gap-3 p-3 rounded-2xl border ${urgencyColor(days)}`}>
+                <Bell size={15} className="text-muted-foreground flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{r.title}</p>
-                  <p className="text-xs opacity-70">
-                    {days === 0 ? "Oggi!" : days < 0 ? `Scaduto da ${Math.abs(days)} giorni` : `Tra ${days} giorni`}
-                    {r.recurrenceDays && ` • Ricorrente`}
+                  <p className="text-xs text-muted-foreground">
+                    {days <= 0 ? (days === 0 ? "Oggi" : `Scaduto da ${Math.abs(days)}gg`) : `Tra ${days} giorni`}
+                    {r.recurrenceDays && " · Ricorrente"}
                   </p>
+                  {r.notes && <p className="text-xs text-muted-foreground truncate">{r.notes}</p>}
                 </div>
                 <div className="flex gap-1">
-                  <button
-                    onClick={() => toggleDone(r.id)}
-                    className="w-8 h-8 rounded-xl bg-white/60 flex items-center justify-center"
-                    title="Segna come fatto"
-                  >
-                    <Check size={14} />
+                  <button onClick={() => toggleDone(r.id)} className="w-7 h-7 rounded-xl bg-muted/50 flex items-center justify-center">
+                    <Check size={13} />
                   </button>
-                  <button
-                    onClick={() => deleteReminder(r.id)}
-                    className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-xl bg-white/60 flex items-center justify-center transition-opacity"
-                  >
-                    <Trash2 size={12} />
+                  <button onClick={() => deleteReminder(r.id)} className="w-7 h-7 rounded-xl bg-red-50 flex items-center justify-center">
+                    <Trash2 size={12} className="text-red-400" />
                   </button>
                 </div>
               </div>
@@ -265,46 +270,58 @@ function RemindersSection({ petId, petName }: { petId: string; petName: string }
 
 // ---------- Health Tab ----------
 function HealthTab({ petId, petName }: { petId: string; petName: string }) {
-  const { events, weightHistory, addEvent } = useHealthLog(petId);
+  const { events, weightHistory, addEvent, deleteEvent } = useHealthLog(petId);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ type: "note" as HealthEventType, date: new Date().toISOString().split("T")[0], title: "", description: "", value: "" });
+  const [selectedWeightIdx, setSelectedWeightIdx] = useState<number | null>(null);
 
-  const latestWeight = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1] : null;
-  const prevWeight = weightHistory.length > 1 ? weightHistory[weightHistory.length - 2] : null;
-  const weightDiff = latestWeight && prevWeight ? (latestWeight.value! - prevWeight.value!).toFixed(1) : null;
+  const displayIdx = selectedWeightIdx ?? (weightHistory.length > 0 ? weightHistory.length - 1 : null);
+  const displayWeight = displayIdx !== null ? weightHistory[displayIdx] : null;
+  const prevEntry = displayIdx !== null && displayIdx > 0 ? weightHistory[displayIdx - 1] : null;
+  const weightDiff = displayWeight && prevEntry ? (displayWeight.value! - prevEntry.value!).toFixed(1) : null;
 
   return (
     <div className="space-y-4">
-      {/* Weight mini chart */}
+      {/* Weight interactive chart */}
       {weightHistory.length > 0 && (
         <div className="bg-card rounded-3xl p-5 shadow-sm border border-border">
           <h3 className="mb-3">Peso nel tempo</h3>
-          <div className="flex items-end gap-2 mb-3">
-            <span className="text-3xl">{latestWeight?.value} kg</span>
+          <div className="flex items-end gap-2 mb-4">
+            <span className="text-3xl">{displayWeight?.value} kg</span>
             {weightDiff !== null && (
               <span className={`text-sm mb-1 ${parseFloat(weightDiff) > 0 ? "text-orange-500" : "text-green-600"}`}>
-                {parseFloat(weightDiff) > 0 ? "▲" : "▼"} {Math.abs(parseFloat(weightDiff))} kg
+                {parseFloat(weightDiff) > 0 ? "+" : ""}{weightDiff} kg
               </span>
             )}
+            {displayWeight && (
+              <span className="text-sm text-muted-foreground mb-1 ml-1">{displayWeight.date}</span>
+            )}
           </div>
-          <div className="flex items-end gap-1 h-16">
-            {weightHistory.map((e, i) => {
+          <div className="flex items-end gap-1.5 h-20">
+            {(() => {
               const vals = weightHistory.map((x) => x.value!);
-              const min = Math.min(...vals) * 0.98;
-              const max = Math.max(...vals) * 1.02;
-              const pct = ((e.value! - min) / (max - min)) * 100;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className={`w-full rounded-t-sm transition-all ${i === weightHistory.length - 1 ? "bg-[var(--pastel-orange)]" : "bg-muted"}`}
-                    style={{ height: `${Math.max(pct, 10)}%` }}
-                  />
-                  <span className="text-xs text-muted-foreground" style={{ fontSize: "9px" }}>
-                    {e.date.slice(5)}
-                  </span>
-                </div>
-              );
-            })}
+              const min = Math.min(...vals) * 0.97;
+              const max = Math.max(...vals) * 1.03;
+              return weightHistory.map((e, i) => {
+                const pct = max === min ? 50 : ((e.value! - min) / (max - min)) * 100;
+                const isSelected = i === displayIdx;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedWeightIdx(i === selectedWeightIdx ? null : i)}
+                    className="flex-1 flex flex-col items-center gap-1 group"
+                  >
+                    <div
+                      className={`w-full rounded-t transition-all ${isSelected ? "bg-[var(--pastel-orange)]" : "bg-muted group-hover:bg-[var(--pastel-orange)]/50"}`}
+                      style={{ height: `${Math.max(pct, 8)}%` }}
+                    />
+                    <span className={`text-center leading-tight transition-colors ${isSelected ? "text-[var(--pastel-orange)] font-medium" : "text-muted-foreground"}`} style={{ fontSize: "9px" }}>
+                      {e.date.slice(5)}
+                    </span>
+                  </button>
+                );
+              });
+            })()}
           </div>
         </div>
       )}
@@ -329,7 +346,7 @@ function HealthTab({ petId, petName }: { petId: string; petName: string }) {
               className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm"
             >
               {(Object.keys(HEALTH_LABELS) as HealthEventType[]).map((t) => (
-                <option key={t} value={t}>{HEALTH_ICONS[t]} {HEALTH_LABELS[t]}</option>
+                <option key={t} value={t}>{HEALTH_LABELS[t]}</option>
               ))}
             </select>
             <input
@@ -393,16 +410,26 @@ function HealthTab({ petId, petName }: { petId: string; petName: string }) {
                   {i < events.length - 1 && <div className="w-0.5 flex-1 bg-muted/40 mt-1" />}
                 </div>
                 <div className="flex-1 pb-3">
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-sm font-medium">{e.title}</p>
-                    <span className="text-xs text-muted-foreground">{e.date}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-sm font-medium">{e.title}</p>
+                        <span className="text-xs text-muted-foreground flex-shrink-0">{e.date}</span>
+                      </div>
+                      {e.value != null && (
+                        <p className="text-sm text-[var(--pastel-orange)]">{e.value} kg</p>
+                      )}
+                      {e.description && (
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{e.description}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => deleteEvent(e.id)}
+                      className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity mt-0.5"
+                    >
+                      <Trash2 size={11} className="text-red-400" />
+                    </button>
                   </div>
-                  {e.value != null && (
-                    <p className="text-sm text-[var(--pastel-orange)]">{e.value} kg</p>
-                  )}
-                  {e.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{e.description}</p>
-                  )}
                 </div>
               </div>
             ))}
@@ -595,20 +622,6 @@ export function PetDetail() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => navigate("/agenda")}
-                className="py-4 rounded-2xl bg-[var(--pastel-peach)] text-white text-sm"
-              >
-                Agenda
-              </button>
-              <button
-                onClick={() => setActiveTab("health")}
-                className="py-4 rounded-2xl bg-[var(--pastel-mint)] text-white text-sm"
-              >
-                Cartella clinica
-              </button>
-            </div>
           </div>
         )}
 

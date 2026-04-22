@@ -14,6 +14,7 @@ import {
   Heart,
   AlertTriangle,
 } from "lucide-react";
+import { useReminders } from "../hooks/useReminders";
 import maxImage from "../../imports/cane-1.jpg";
 import logoImage from "../../imports/Screenshot_2026-04-21_alle_23.14.42.png";
 import { useFavorites } from "../hooks/useFavorites";
@@ -95,6 +96,7 @@ export function Home() {
   const touchStartX = useRef<number | null>(null);
   const { favorites } = useFavorites();
   const favoriteServices = favorites.map((id) => getServiceById(id)).filter(Boolean);
+  const { upcoming: allReminders } = useReminders();
   const [favIndex, setFavIndex] = useState(0);
   const favTouchStartX = useRef<number | null>(null);
 
@@ -147,8 +149,16 @@ export function Home() {
             <p className="text-sm text-muted-foreground">Ciao</p>
             <h1 className="text-2xl">Mario</h1>
           </div>
-          <button className="w-12 h-12 rounded-2xl bg-card shadow-sm flex items-center justify-center">
+          <button
+            onClick={() => navigate("/reminders")}
+            className="w-12 h-12 rounded-2xl bg-card shadow-sm flex items-center justify-center relative"
+          >
             <Bell size={22} />
+            {allReminders.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--pastel-coral)] text-white text-xs flex items-center justify-center">
+                {allReminders.length > 9 ? "9+" : allReminders.length}
+              </span>
+            )}
           </button>
         </div>
 
@@ -250,21 +260,6 @@ export function Home() {
           </div>
         </div>
 
-        {/* Emergency banner */}
-        <button
-          onClick={() => navigate("/emergency")}
-          className="w-full mb-6 p-4 rounded-3xl bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md flex items-center gap-4"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle size={24} className="text-white" />
-          </div>
-          <div className="text-left">
-            <p className="font-semibold">Pronto Soccorso Veterinario</p>
-            <p className="text-xs text-white/80">Cliniche d'emergenza 24h • Primo soccorso</p>
-          </div>
-          <div className="ml-auto text-white/60 text-xl">›</div>
-        </button>
-
         <div>
           <h2 className="mb-4">Servizi</h2>
           <div className="mb-4">
@@ -281,12 +276,23 @@ export function Home() {
             </div>
           </div>
 
+          {/* Emergency banner */}
+          <button
+            onClick={() => navigate("/emergency")}
+            className="w-full mb-4 p-4 rounded-3xl bg-[var(--pastel-coral)]/20 border border-[var(--pastel-coral)]/30 flex items-center gap-3"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[var(--pastel-coral)]/30 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={20} className="text-[var(--pastel-coral)]" strokeWidth={2.5} />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-foreground">Pronto Soccorso Veterinario</p>
+              <p className="text-xs text-muted-foreground">Cliniche 24h · Primo soccorso</p>
+            </div>
+            <div className="ml-auto text-muted-foreground text-lg">›</div>
+          </button>
+
           {favoriteServices.length > 0 && (
             <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Heart size={16} className="text-red-400 fill-red-400" />
-                <h3 className="text-sm text-muted-foreground">Preferiti</h3>
-              </div>
               <div
                 className="w-full rounded-2xl bg-card shadow-sm border border-border overflow-hidden"
                 onTouchStart={handleFavTouchStart}
@@ -305,11 +311,14 @@ export function Home() {
                       <p className="text-xs text-muted-foreground truncate">{favoriteServices[favIndex]!.address}</p>
                     )}
                   </div>
-                  {favoriteServices.length > 1 && (
-                    <span className="text-xs text-muted-foreground flex-shrink-0">
-                      {favIndex + 1}/{favoriteServices.length}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {favoriteServices.length > 1 && (
+                      <span className="text-xs text-muted-foreground">
+                        {favIndex + 1}/{favoriteServices.length}
+                      </span>
+                    )}
+                    <Heart size={14} className="text-red-400 fill-red-400" />
+                  </div>
                 </button>
                 {favoriteServices.length > 1 && (
                   <div className="flex justify-center gap-1.5 pb-3">

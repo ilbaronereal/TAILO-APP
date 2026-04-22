@@ -17,12 +17,12 @@ import { useGeolocation, calcDistanceKm, formatDistance } from "../hooks/useGeol
 
 type Filter = "open_now" | "nearby" | "top_rated" | "h24" | "new_clients";
 
-const FILTERS: { id: Filter; label: string; icon: string }[] = [
-  { id: "open_now", label: "Aperti ora", icon: "🟢" },
-  { id: "nearby", label: "Vicini a me", icon: "📍" },
-  { id: "top_rated", label: "Meglio votati", icon: "⭐" },
-  { id: "h24", label: "24h", icon: "🌙" },
-  { id: "new_clients", label: "Accetta nuovi", icon: "✅" },
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: "open_now", label: "Aperti ora" },
+  { id: "nearby", label: "Vicini a me" },
+  { id: "top_rated", label: "Meglio votati" },
+  { id: "h24", label: "24h" },
+  { id: "new_clients", label: "Accetta nuovi" },
 ];
 
 function isOpenNow(hours: { day: string; time: string }[]): boolean {
@@ -151,31 +151,10 @@ export function CategoryList() {
             className="w-full pl-11 pr-10 py-3 rounded-2xl bg-white/20 text-white placeholder-white/60 border-0 focus:ring-2 focus:ring-white/30 text-sm"
           />
           {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-            >
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
               <X size={16} className="text-white/60" />
             </button>
           )}
-        </div>
-
-        {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1 mb-3" style={{ scrollbarWidth: "none" }}>
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => toggleFilter(f.id)}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all ${
-                activeFilters.includes(f.id)
-                  ? "bg-white text-foreground shadow-sm"
-                  : "bg-white/20 text-white"
-              }`}
-            >
-              <span>{f.icon}</span>
-              <span>{f.label}</span>
-            </button>
-          ))}
         </div>
 
         <div className="flex gap-2 bg-white/20 p-1 rounded-2xl">
@@ -202,25 +181,35 @@ export function CategoryList() {
 
       {viewMode === "list" ? (
         <div className="p-6 space-y-4">
+          {/* Filter chips in white area */}
+          <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => toggleFilter(f.id)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs border transition-all ${
+                  activeFilters.includes(f.id)
+                    ? "bg-[var(--pastel-orange)] text-white border-transparent"
+                    : "bg-card text-muted-foreground border-border"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               {filtered.length} risultat{filtered.length === 1 ? "o" : "i"}
               {activeFilters.length > 0 && (
-                <button
-                  onClick={() => setActiveFilters([])}
-                  className="ml-2 text-[var(--pastel-orange)] underline"
-                >
+                <button onClick={() => setActiveFilters([])} className="ml-2 text-[var(--pastel-orange)] underline">
                   Rimuovi filtri
                 </button>
               )}
             </p>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Locate size={13} />
-              {geoLoading
-                ? "Ricerca posizione..."
-                : geoError
-                ? "Posizione non disponibile"
-                : "Ordinati per distanza"}
+              {geoLoading ? "Ricerca posizione..." : geoError ? "Posizione non disponibile" : "Per distanza"}
             </div>
           </div>
 

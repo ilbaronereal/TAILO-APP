@@ -76,5 +76,9 @@ export function useHealthLog(petId: string) {
     ]);
   };
 
-  return { events: petEvents, weightHistory, addEvent };
+  const deleteEvent = (id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  return { events: petEvents, weightHistory, addEvent, deleteEvent };
 }

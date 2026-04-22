@@ -15,7 +15,7 @@ function LostPetCard({ pet }: { pet: LostPet }) {
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${badgeColor}`}>
-              {pet.type === "lost" ? "🔍 SMARRITO" : "✅ TROVATO"}
+              {pet.type === "lost" ? "SMARRITO" : "TROVATO"}
             </span>
             {pet.reward && (
               <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-700">
@@ -281,7 +281,7 @@ export function LostPets() {
         </div>
 
         <div className="flex gap-2">
-          {([["all", "Tutti"], ["lost", "🔍 Smarriti"], ["found", "✅ Trovati"]] as const).map(([val, label]) => (
+          {([["all", "Tutti"], ["lost", "Smarriti"], ["found", "Trovati"]] as const).map(([val, label]) => (
             <button
               key={val}
               onClick={() => setTab(val)}

@@ -7,6 +7,7 @@ import { ServiceDetail } from "./pages/ServiceDetail";
 import { Agenda } from "./pages/Agenda";
 import { Emergency } from "./pages/Emergency";
 import { LostPets } from "./pages/LostPets";
+import { Reminders } from "./pages/Reminders";
 import { Layout } from "./components/Layout";
 
 export const router = createHashRouter([
@@ -22,6 +23,7 @@ export const router = createHashRouter([
       { path: "agenda", Component: Agenda },
       { path: "emergency", Component: Emergency },
       { path: "lost-pets", Component: LostPets },
+      { path: "reminders", Component: Reminders },
     ],
   },
 ]);
