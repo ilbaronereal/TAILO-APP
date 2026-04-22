@@ -5,6 +5,8 @@ import { PetDetail } from "./pages/PetDetail";
 import { CategoryList } from "./pages/CategoryList";
 import { ServiceDetail } from "./pages/ServiceDetail";
 import { Agenda } from "./pages/Agenda";
+import { Emergency } from "./pages/Emergency";
+import { LostPets } from "./pages/LostPets";
 import { Layout } from "./components/Layout";
 
 export const router = createHashRouter([
@@ -18,6 +20,8 @@ export const router = createHashRouter([
       { path: "category/:categoryId", Component: CategoryList },
       { path: "service/:serviceId", Component: ServiceDetail },
       { path: "agenda", Component: Agenda },
+      { path: "emergency", Component: Emergency },
+      { path: "lost-pets", Component: LostPets },
     ],
   },
 ]);

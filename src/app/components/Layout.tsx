@@ -8,6 +8,7 @@ export function Layout() {
   const navItems = [
     { path: "/", icon: Home, label: "Home" },
     { path: "/agenda", icon: Calendar, label: "Agenda" },
+    { path: "/lost-pets", icon: Search, label: "Smarriti" },
     { path: "/pet-profile", icon: User, label: "Profilo" },
   ];
 
@@ -16,7 +17,7 @@ export function Layout() {
       <Outlet />
 
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-        <div className="max-w-md mx-auto px-6 py-3">
+        <div className="max-w-md mx-auto px-4 py-3">
           <div className="flex justify-around items-center">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -25,13 +26,13 @@ export function Layout() {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all ${
+                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all ${
                     isActive
                       ? "bg-[var(--pastel-orange)] text-white"
                       : "text-muted-foreground"
                   }`}
                 >
-                  <Icon size={24} strokeWidth={2.5} />
+                  <Icon size={22} strokeWidth={2.5} />
                   <span className="text-xs">{item.label}</span>
                 </button>
               );

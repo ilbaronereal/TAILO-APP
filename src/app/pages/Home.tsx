@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
   Stethoscope,
   Scissors,
@@ -11,9 +11,13 @@ import {
   ShoppingBag,
   Search,
   Bell,
+  Heart,
+  AlertTriangle,
 } from "lucide-react";
 import maxImage from "../../imports/cane-1.jpg";
 import logoImage from "../../imports/Screenshot_2026-04-21_alle_23.14.42.png";
+import { useFavorites } from "../hooks/useFavorites";
+import { getServiceById } from "../data/services";
 
 const categories = [
   {
@@ -89,6 +93,29 @@ export function Home() {
   const navigate = useNavigate();
   const [currentPetIndex, setCurrentPetIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const { favorites } = useFavorites();
+  const favoriteServices = favorites.map((id) => getServiceById(id)).filter(Boolean);
+  const [favIndex, setFavIndex] = useState(0);
+  const favTouchStartX = useRef<number | null>(null);
+
+  const nextFav = useCallback(() => {
+    setFavIndex((prev) => (prev + 1) % favoriteServices.length);
+  }, [favoriteServices.length]);
+
+  const prevFav = useCallback(() => {
+    setFavIndex((prev) => (prev - 1 + favoriteServices.length) % favoriteServices.length);
+  }, [favoriteServices.length]);
+
+  const handleFavTouchStart = (e: React.TouchEvent) => {
+    favTouchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleFavTouchEnd = (e: React.TouchEvent) => {
+    if (favTouchStartX.current === null) return;
+    const diff = favTouchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) diff > 0 ? nextFav() : prevFav();
+    favTouchStartX.current = null;
+  };
 
   const nextPet = () => {
     setCurrentPetIndex((prev) => (prev + 1) % pets.length);
@@ -223,6 +250,21 @@ export function Home() {
           </div>
         </div>
 
+        {/* Emergency banner */}
+        <button
+          onClick={() => navigate("/emergency")}
+          className="w-full mb-6 p-4 rounded-3xl bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md flex items-center gap-4"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle size={24} className="text-white" />
+          </div>
+          <div className="text-left">
+            <p className="font-semibold">Pronto Soccorso Veterinario</p>
+            <p className="text-xs text-white/80">Cliniche d'emergenza 24h • Primo soccorso</p>
+          </div>
+          <div className="ml-auto text-white/60 text-xl">›</div>
+        </button>
+
         <div>
           <h2 className="mb-4">Servizi</h2>
           <div className="mb-4">
@@ -238,6 +280,54 @@ export function Home() {
               />
             </div>
           </div>
+
+          {favoriteServices.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Heart size={16} className="text-red-400 fill-red-400" />
+                <h3 className="text-sm text-muted-foreground">Preferiti</h3>
+              </div>
+              <div
+                className="w-full rounded-2xl bg-card shadow-sm border border-border overflow-hidden"
+                onTouchStart={handleFavTouchStart}
+                onTouchEnd={handleFavTouchEnd}
+              >
+                <button
+                  onClick={() => navigate(`/service/${favoriteServices[favIndex]!.id}`)}
+                  className="w-full p-4 flex items-center gap-4"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[var(--pastel-orange)]/20 flex items-center justify-center text-2xl flex-shrink-0">
+                    {favoriteServices[favIndex]!.emoji}
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{favoriteServices[favIndex]!.name}</p>
+                    {favoriteServices[favIndex]!.address && (
+                      <p className="text-xs text-muted-foreground truncate">{favoriteServices[favIndex]!.address}</p>
+                    )}
+                  </div>
+                  {favoriteServices.length > 1 && (
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
+                      {favIndex + 1}/{favoriteServices.length}
+                    </span>
+                  )}
+                </button>
+                {favoriteServices.length > 1 && (
+                  <div className="flex justify-center gap-1.5 pb-3">
+                    {favoriteServices.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setFavIndex(i)}
+                        className={`h-1.5 rounded-full transition-all ${
+                          i === favIndex ? "w-4 bg-[var(--pastel-orange)]" : "w-1.5 bg-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             {categories.map((category) => {
               const Icon = category.icon;

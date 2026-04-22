@@ -13,6 +13,8 @@ export interface Service {
   lat: number;
   lng: number;
   emoji: string;
+  is24h?: boolean;
+  isEmergency?: boolean;
 }
 
 const allServices: Service[] = [
@@ -79,7 +81,7 @@ const allServices: Service[] = [
       { name: "Emergenze", description: "Pronto soccorso h24", icon: "🚨", available: true },
       { name: "Ricovero", description: "Degenza e monitoraggio", icon: "🛏️", available: true },
     ],
-    lat: 45.458, lng: 9.201, emoji: "🏥",
+    lat: 45.458, lng: 9.201, emoji: "🏥", is24h: true,
   },
 
   // Toilettatura
@@ -190,7 +192,7 @@ const allServices: Service[] = [
       { name: "Pet sitting a domicilio", description: "Andiamo da te", icon: "🚗", available: true },
       { name: "Visite di controllo", description: "1-3 visite al giorno", icon: "👁️", available: true },
     ],
-    lat: 45.469, lng: 9.187, emoji: "🏠",
+    lat: 45.469, lng: 9.187, emoji: "🏠", is24h: true,
   },
   {
     id: "ps-2",
@@ -274,7 +276,7 @@ const allServices: Service[] = [
       { name: "Toelettatura inclusa", description: "Bagno prima del ritorno", icon: "🛁", available: true },
       { name: "Webcam live", description: "Guarda il tuo pet in tempo reale", icon: "📹", available: true },
     ],
-    lat: 45.479, lng: 9.212, emoji: "🏨",
+    lat: 45.479, lng: 9.212, emoji: "🏨", is24h: true,
   },
   {
     id: "brd-2",
@@ -381,6 +383,67 @@ const allServices: Service[] = [
       { name: "Trasportini e gabbie", description: "Per ogni esigenza", icon: "🧳", available: true },
     ],
     lat: 45.474, lng: 9.202, emoji: "🛍️",
+  },
+
+  // Pronto Soccorso
+  {
+    id: "emg-1",
+    name: "Pronto Soccorso Veterinario Milano",
+    category: "emergency",
+    rating: 4.9,
+    reviews: 412,
+    distance: "1.8 km",
+    address: "Via Procaccini 54, Milano",
+    phone: "+39 02 4400 6070",
+    website: "www.psvet-milano.it",
+    hours: [{ day: "Tutti i giorni", time: "Aperto 24h" }],
+    services: [
+      { name: "Pronto Soccorso", description: "Emergenze h24 7/7", icon: "🚨", available: true },
+      { name: "Chirurgia d'urgenza", description: "Sala operatoria sempre attiva", icon: "⚕️", available: true },
+      { name: "Terapia intensiva", description: "Monitoraggio continuo", icon: "🫀", available: true },
+      { name: "Radiologia urgenza", description: "Diagnostica immediata", icon: "📷", available: true },
+      { name: "Trasfusioni", description: "Banca del sangue pet", icon: "🩸", available: true },
+    ],
+    lat: 45.472, lng: 9.182, emoji: "🚨", is24h: true, isEmergency: true,
+  },
+  {
+    id: "emg-2",
+    name: "Clinica Veterinaria Notturna",
+    category: "emergency",
+    rating: 4.8,
+    reviews: 287,
+    distance: "3.1 km",
+    address: "Corso XXII Marzo 15, Milano",
+    phone: "+39 02 5518 2020",
+    website: "www.vetnotturno.it",
+    hours: [
+      { day: "Lun-Ven", time: "20:00 - 8:00 (notte)" },
+      { day: "Sab-Dom", time: "Aperto 24h" },
+    ],
+    services: [
+      { name: "Urgenze notturne", description: "Copertura nelle ore serali", icon: "🌙", available: true },
+      { name: "Ricovero urgenza", description: "Degenza d'emergenza", icon: "🛏️", available: true },
+      { name: "Rianimazione", description: "Supporto vitale avanzato", icon: "💉", available: true },
+    ],
+    lat: 45.458, lng: 9.208, emoji: "🚨", is24h: true, isEmergency: true,
+  },
+  {
+    id: "emg-3",
+    name: "AmbulVet Milano — Veterinario a Domicilio",
+    category: "emergency",
+    rating: 4.7,
+    reviews: 198,
+    distance: "0 km",
+    address: "Servizio a domicilio su tutta Milano",
+    phone: "+39 02 8899 0011",
+    website: "www.ambulvet.it",
+    hours: [{ day: "Tutti i giorni", time: "7:00 - 23:00" }],
+    services: [
+      { name: "Visita a domicilio", description: "Il veterinario viene da te", icon: "🏠", available: true },
+      { name: "Prelievi a domicilio", description: "Esami del sangue a casa", icon: "🩺", available: true },
+      { name: "Eutanasia domiciliare", description: "In serenità a casa", icon: "🕊️", available: true },
+    ],
+    lat: 45.464, lng: 9.19, emoji: "🏠", isEmergency: true,
   },
 ];
 
